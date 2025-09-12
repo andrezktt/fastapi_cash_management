@@ -1,5 +1,9 @@
 from sqlalchemy.orm import Session
 from . import  models, schemas, auth
+from sqlalchemy import func, extract
+
+from .models import TransactionType
+
 
 def get_user_by_email(db: Session, email: str):
     return db.query(models.User).filter(models.User.email == email).first()
@@ -25,3 +29,22 @@ def get_transactions(db: Session, user_id: int, skip: int = 0, limit: int = 100)
             .offset(skip)
             .limit(limit)
             .all())
+
+def get_monthly_report(db: Session, user_id: int, year: int, month: int):
+    income = db.query(func.sum(models.Transaction.amount)).filter(
+        models.Transaction.user_id == user_id,
+        extract("year", models.Transaction.date) == year,
+        extract("month", models.Transaction.date) == month,
+        models.Transaction.trans_type == TransactionType.INCOME
+    ).scalar() or 0.0
+
+    expenses = db.query(func.sum(models.Transaction.amount)).filter(
+        models.Transaction.user_id == user_id,
+        extract("year", models.Transaction.date) == year,
+        extract("month", models.Transaction.date) == month,
+        models.Transaction.trans_type == TransactionType.EXPENSE
+    ).scalar() or 0.0
+
+    balance = income - expenses
+
+    return {"income": income, "expenses": expenses, "balance": balance}

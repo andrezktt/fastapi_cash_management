@@ -4,6 +4,7 @@ from typing import List
 from .. import crud, schemas, models
 from ..database import get_database
 from ..dependencies import get_current_user
+from datetime import date
 
 router = APIRouter(
     prefix="/transactions",
@@ -24,3 +25,12 @@ def read_transactions(skip: int = 0,
                       current_user: models.User = Depends(get_current_user)):
     transactions = crud.get_transactions(db=db, user_id=current_user.id, skip=skip, limit=limit)
     return transactions
+
+@router.get("/report/monthly", response_model=dict)
+def get_monthly_report(
+        year: int = date.today().year,
+        month: int = date.today().month,
+        db: Session = Depends(get_database),
+        current_user: models.User = Depends(get_current_user)):
+    report = crud.get_monthly_report(db=db, user_id=current_user.id, year=year, month=month)
+    return report
