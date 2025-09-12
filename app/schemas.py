@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from datetime import datetime
 from typing import List, Optional
-from models import TransactionType
+from .models import TransactionType
 
 class TransactionBase(BaseModel):
     trans_type: TransactionType

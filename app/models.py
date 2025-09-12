@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, Float, DateTime, ForeignKey, Enum, String
 from sqlalchemy.orm import relationship
-from database import Base
+from .database import Base
 import enum
 from datetime import datetime, UTC
 
@@ -9,7 +9,7 @@ class TransactionType(str, enum.Enum):
     EXPENSE = "expense"
 
 class User(Base):
-    __tablename = "users"
+    __tablename__ = "users"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
     email = Column(String, unique=True, index=True, nullable=False)
