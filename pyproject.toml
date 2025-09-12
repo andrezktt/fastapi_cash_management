@@ -3,4 +3,14 @@ name = "cash-management-api"
 version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "alembic>=1.16.5",
+    "fastapi[all]>=0.116.1",
+    "passlib[bcrypt]>=1.7.4",
+    "psycopg2-binary>=2.9.10",
+    "pytest>=8.4.2",
+    "python-decouple>=3.8",
+    "python-jose[cryptography]>=3.5.0",
+    "requests>=2.32.5",
+    "sqlalchemy[asyncio]>=2.0.43",
+]
