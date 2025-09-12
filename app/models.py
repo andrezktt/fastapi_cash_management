@@ -20,7 +20,7 @@ class Transaction(Base):
     __tablename__ = "transactions"
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
-    type = Column(Enum(TransactionType))
+    trans_type = Column(Enum(TransactionType))
     amount = Column(Float, nullable=False)
     description = Column(String, index=True)
     date = Column(DateTime, default=datetime.now(UTC))
