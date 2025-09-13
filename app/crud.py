@@ -30,6 +30,25 @@ def get_transactions(db: Session, user_id: int, skip: int = 0, limit: int = 100)
             .limit(limit)
             .all())
 
+def get_transaction_by_id(db: Session, transaction_id: int):
+    return db.query(models.Transaction).filter(models.Transaction.id == transaction_id).first()
+
+def update_transaction(db: Session, db_transaction: models.Transaction, transaction_in: schemas.TransactionUpdate):
+    update_data = transaction_in.model_dump(exclude_unset=True)
+
+    for key, value in update_data.items():
+        setattr(db_transaction, key, value)
+
+    db.add(db_transaction)
+    db.commit()
+    db.refresh(db_transaction)
+    return db_transaction
+
+def delete_transaction(db: Session, db_transaction: models.Transaction):
+    db.delete(db_transaction)
+    db.commit()
+    return db_transaction
+
 def get_monthly_report(db: Session, user_id: int, year: int, month: int):
     income = db.query(func.sum(models.Transaction.amount)).filter(
         models.Transaction.user_id == user_id,

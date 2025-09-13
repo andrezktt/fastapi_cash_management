@@ -11,6 +11,11 @@ class TransactionBase(BaseModel):
 class TransactionCreate(TransactionBase):
     pass
 
+class TransactionUpdate(BaseModel):
+    trans_type: Optional[TransactionType] = None
+    amount: Optional[float] = None
+    description: Optional[str] = None
+
 class Transaction(TransactionBase):
     id: int
     user_id: int
