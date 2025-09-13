@@ -4,7 +4,7 @@ from sqlalchemy import func, extract
 
 from .models import TransactionType
 
-
+# User Methods
 def get_user_by_email(db: Session, email: str):
     return db.query(models.User).filter(models.User.email == email).first()
 
@@ -16,6 +16,25 @@ def create_user(db: Session, user: schemas.UserCreate):
     db.refresh(db_user)
     return db_user
 
+def update_user(db: Session, db_user: models.User, user_in: schemas.UserUpdate):
+    update_data = user_in.model_dump(exclude_unset=True)
+    if "password" in update_data:
+        hashed_password = auth.get_password_hash(update_data["password"])
+        update_data["password"] = hashed_password
+        update_data["hashed_password"] = update_data.pop("password")
+    for key, value in update_data.items():
+        setattr(db_user, key, value)
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
+def delete_user(db: Session, db_user: models.User):
+    db.delete(db_user)
+    db.commit()
+    return db_user
+
+# Transaction Methods
 def create_user_transaction(db: Session, transaction: schemas.TransactionCreate, user_id: int):
     db_transaction = models.Transaction(**transaction.model_dump(), user_id=user_id)
     db.add(db_transaction)
