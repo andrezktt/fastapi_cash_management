@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
-from .. import crud, schemas, models
+from .. import crud, schemas, models, services
 from ..database import get_database
 from ..dependencies import get_current_user
 from datetime import date
@@ -40,21 +40,11 @@ def update_transaction(transaction_id: int,
                        transaction_in: schemas.TransactionUpdate,
                        db: Session = Depends(get_database),
                        current_user: models.User = Depends(get_current_user)):
-    db_transaction = crud.get_transaction_by_id(db=db, transaction_id=transaction_id)
-    if db_transaction is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Transaction not found!")
-    if db_transaction.user_id != current_user.id:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to update this transaction.")
-    return crud.update_transaction(db=db, db_transaction=db_transaction, transaction_in=transaction_in)
+    return services.update_transaction(db, current_user, transaction_id, transaction_in)
 
 @router.delete("/{transaction_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_transaction(transaction_id: int,
                        db: Session = Depends(get_database),
                        current_user: models.User = Depends(get_current_user)):
-    db_transaction = crud.get_transaction_by_id(db, transaction_id)
-    if db_transaction is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Transaction not found!")
-    if db_transaction.user_id != current_user.id:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to delete this transaction.")
-    crud.delete_transaction(db, db_transaction)
+    services.delete_transaction(db, current_user, transaction_id)
     return None
