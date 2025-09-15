@@ -130,3 +130,32 @@ def delete_category(db: Session, db_category: models.Category):
     db.delete(db_category)
     db.commit()
     return db_category
+
+# Recurring Transactions Methods
+def get_recurring_transaction(db: Session, recurring_transaction_id: int):
+    return db.query(models.RecurringTransaction).filter(models.RecurringTransaction.id == recurring_transaction_id).first()
+
+def get_recurring_transactions_by_user(db: Session, user_id: int, skip: int = 0, limit: int = 100):
+    return db.query(models.RecurringTransaction).filter(models.RecurringTransaction.user_id == user_id).offset(skip).limit(100).all()
+
+def create_recurring_transaction(db: Session, recurring_transaction: schemas.RecurringTransactionCreate, user_id: int):
+    db_recurring_transaction = models.RecurringTransaction(**recurring_transaction.model_dump(), user_id=user_id)
+    db.add(db_recurring_transaction)
+    db.commit()
+    db.refresh(db_recurring_transaction)
+    return db_recurring_transaction
+
+def update_recurring_transaction(db: Session, db_recurring_transaction: models.RecurringTransaction,
+                                 recurring_transaction_in: schemas.RecurringTransactionUpdate):
+    update_data = recurring_transaction_in.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(db_recurring_transaction, key, value)
+    db.add(db_recurring_transaction)
+    db.commit()
+    db.refresh(db_recurring_transaction)
+    return db_recurring_transaction
+
+def delete_recurring_transaction(db: Session, db_recurring_transaction: models.RecurringTransaction):
+    db.delete(db_recurring_transaction)
+    db.commit()
+    return db_recurring_transaction

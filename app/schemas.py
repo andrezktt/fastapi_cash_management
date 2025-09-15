@@ -1,7 +1,7 @@
 from pydantic import BaseModel
-from datetime import datetime
+from datetime import datetime, date
 from typing import Optional, TypeVar, List, Generic
-from .models import TransactionType
+from .models import TransactionType, FrequencyEnum
 
 class CategoryBase(BaseModel):
     name: str
@@ -75,3 +75,39 @@ class Page(BaseModel, Generic[DataT]):
     total: int
     page: int
     size: int
+
+class RecurringTransactionBase(BaseModel):
+    description: str
+    amount: float
+    trans_type: TransactionType
+    frequency: FrequencyEnum
+    start_date: date
+    end_date: Optional[date] = None
+    category_id: Optional[int] = None
+    day_of_month: Optional[int] = None
+    day_of_week: Optional[int] = None
+
+
+class RecurringTransactionCreate(RecurringTransactionBase):
+    pass
+
+
+class RecurringTransactionUpdate(BaseModel):
+    description: Optional[str] = None
+    amount: Optional[float] = None
+    trans_type: Optional[TransactionType] = None
+    frequency: Optional[FrequencyEnum] = None
+    start_date: Optional[date] = None
+    end_date: Optional[date] = None
+    category_id: Optional[int] = None
+    day_of_month: Optional[int] = None
+    day_of_week: Optional[int] = None
+
+
+class RecurringTransaction(RecurringTransactionBase):
+    id: int
+    user_id: int
+    category: Optional[Category] = None
+
+    class Config:
+        orm_mode = True

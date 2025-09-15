@@ -45,3 +45,25 @@ def delete_category(db: Session,
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to delete this category.")
     crud.delete_category(db, db_category)
     return None
+
+def update_recurring_transaction(db: Session,
+                                 user: models.User,
+                                 recurring_id: int,
+                                 recurring_transaction_in: schemas.RecurringTransactionUpdate):
+    db_recurring_transaction = crud.get_recurring_transaction(db, recurring_id)
+    if db_recurring_transaction is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Recurring Transaction not found!")
+    if db_recurring_transaction.user_id != user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to update this recurring transaction.")
+    return crud.update_recurring_transaction(db, db_recurring_transaction, recurring_transaction_in)
+
+def delete_recurring_transaction(db: Session,
+                                 user: models.User,
+                                 recurring_id: int):
+    db_recurring_transaction = crud.get_recurring_transaction(db, recurring_id)
+    if db_recurring_transaction is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Recurring Transaction not found!")
+    if db_recurring_transaction.user_id != user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to update this recurring transaction.")
+    crud.delete_recurring_transaction(db, db_recurring_transaction)
+    return None

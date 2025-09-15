@@ -1,8 +1,8 @@
-from sqlalchemy import Column, Integer, Float, DateTime, ForeignKey, Enum, String
+from sqlalchemy import Column, Integer, Float, DateTime, ForeignKey, Enum, String, Date
 from sqlalchemy.orm import relationship
 from .database import Base
 import enum
-from datetime import datetime, UTC
+from datetime import datetime, UTC, date
 
 class TransactionType(str, enum.Enum):
     INCOME = "income"
@@ -34,4 +34,30 @@ class Transaction(Base):
     date = Column(DateTime, default=datetime.now(UTC))
     category_id = Column(Integer, ForeignKey("categories.id"), nullable=True)
     owner = relationship("User", back_populates="transactions")
+    category = relationship("Category")
+
+class FrequencyEnum(str, enum.Enum):
+    DAILY = "daily"
+    WEEKLY = "weekly"
+    MONTHLY = "monthly"
+
+class RecurringTransaction(Base):
+    __tablename__ = "recurring_transactions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    category_id = Column(Integer, ForeignKey("categories.id"), nullable=True)
+
+    description = Column(String, index=True, nullable=False)
+    amount = Column(Float, nullable=False)
+    trans_type = Column(Enum(TransactionType), nullable=False)
+
+    frequency = Column(Enum(FrequencyEnum), nullable=False)
+    day_of_month = Column(Integer, nullable=True)
+    day_of_week = Column(Integer, nullable=True)
+
+    start_date = Column(Date, nullable=False, default=date.today())
+    end_date = Column(Date, nullable=True)
+
+    owner = relationship("User")
     category = relationship("Category")
