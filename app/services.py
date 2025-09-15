@@ -23,3 +23,25 @@ def delete_transaction(db: Session,
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to delete this transaction.")
     crud.delete_transaction(db, db_transaction)
     return None
+
+def update_category(db: Session,
+                    user: models.User,
+                    category_id: int,
+                    category_in: schemas.CategoryUpdate):
+    db_category = crud.get_category(db, category_id)
+    if db_category is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Category not found!")
+    if db_category.user_id != user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to update this category.")
+    return crud.update_category(db, db_category, category_in)
+
+def delete_category(db: Session,
+                    user: models.User,
+                    category_id: int):
+    db_category = crud.get_category(db, category_id)
+    if db_category is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Category not found!")
+    if db_category.user_id != user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to delete this category.")
+    crud.delete_category(db, db_category)
+    return None

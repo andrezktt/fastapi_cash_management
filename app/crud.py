@@ -114,3 +114,19 @@ def create_user_category(db: Session, category: schemas.CategoryCreate, user_id:
     db.commit()
     db.refresh(db_category)
     return db_category
+
+def update_category(db: Session, db_category: models.Category, category_in: schemas.CategoryUpdate):
+    update_data = category_in.model_dump(exclude_unset=True)
+
+    for key, value in update_data.items():
+        setattr(db_category, key, value)
+
+    db.add(db_category)
+    db.commit()
+    db.refresh(db_category)
+    return db_category
+
+def delete_category(db: Session, db_category: models.Category):
+    db.delete(db_category)
+    db.commit()
+    return db_category
