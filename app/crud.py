@@ -1,6 +1,8 @@
 from sqlalchemy.orm import Session
 from . import  models, schemas, auth
 from sqlalchemy import func, extract
+from typing import Optional
+from datetime import date
 
 from .models import TransactionType
 
@@ -42,12 +44,23 @@ def create_user_transaction(db: Session, transaction: schemas.TransactionCreate,
     db.refresh(db_transaction)
     return db_transaction
 
-def get_transactions(db: Session, user_id: int, skip: int = 0, limit: int = 100):
-    return (db.query(models.Transaction)
-            .filter(models.Transaction.user_id == user_id)
-            .offset(skip)
-            .limit(limit)
-            .all())
+def get_transactions(db: Session, user_id: int, skip: int = 0, limit: int = 100,
+                     start_date: Optional[date] = None,  end_date: Optional[date] = None,
+                     category_id: Optional[int] = None, trans_type: Optional[models.TransactionType] = None):
+
+    query = db.query(models.Transaction).filter(models.Transaction.user_id == user_id)
+
+    if start_date:
+        query = query.filter(models.Transaction.date >= start_date)
+    if end_date:
+        query = query.filter(models.Transaction.date <= end_date)
+    if category_id is not None:
+        query = query.filter(models.Transaction.category_id == category_id)
+    if trans_type:
+        query = query.filter(models.Transaction.trans_type == trans_type)
+
+    transactions = query.order_by(models.Transaction.date.desc()).offset(skip).limit(limit).all()
+    return transactions
 
 def get_transaction_by_id(db: Session, transaction_id: int):
     return db.query(models.Transaction).filter(models.Transaction.id == transaction_id).first()

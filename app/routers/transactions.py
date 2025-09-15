@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 from .. import crud, schemas, models, services
 from ..database import get_database
 from ..dependencies import get_current_user
@@ -19,11 +19,14 @@ def create_transaction(transaction: schemas.TransactionCreate,
     return crud.create_user_transaction(db=db, transaction=transaction, user_id=current_user.id)
 
 @router.get("/", response_model=List[schemas.Transaction])
-def read_transactions(skip: int = 0,
-                      limit: int = 100,
-                      db: Session = Depends(get_database),
+def read_transactions(start_date: Optional[date] = None, end_date: Optional[date] = None,
+                      category_id: Optional[int] = None, trans_type: Optional[models.TransactionType] = None,
+                      skip: int = 0, limit: int = 100, db: Session = Depends(get_database),
                       current_user: models.User = Depends(get_current_user)):
-    transactions = crud.get_transactions(db=db, user_id=current_user.id, skip=skip, limit=limit)
+    transactions = crud.get_transactions(
+        db=db, user_id=current_user.id, skip=skip, limit=limit,
+        start_date=start_date, end_date=end_date, category_id=category_id, trans_type=trans_type
+    )
     return transactions
 
 @router.get("/report/monthly", response_model=dict)
