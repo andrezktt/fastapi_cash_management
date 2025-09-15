@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from datetime import datetime
-from typing import List, Optional
+from typing import Optional, TypeVar, List, Generic
 from .models import TransactionType
 
 class CategoryBase(BaseModel):
@@ -68,3 +68,10 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     email: Optional[str] = None
+
+DataT = TypeVar("DataT")
+class Page(BaseModel, Generic[DataT]):
+    items: List[DataT]
+    total: int
+    page: int
+    size: int

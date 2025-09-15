@@ -18,16 +18,22 @@ def create_transaction(transaction: schemas.TransactionCreate,
                        current_user: models.User = Depends(get_current_user)):
     return crud.create_user_transaction(db=db, transaction=transaction, user_id=current_user.id)
 
-@router.get("/", response_model=List[schemas.Transaction])
+@router.get("/", response_model=schemas.Page[schemas.Transaction])
 def read_transactions(start_date: Optional[date] = None, end_date: Optional[date] = None,
                       category_id: Optional[int] = None, trans_type: Optional[models.TransactionType] = None,
-                      skip: int = 0, limit: int = 100, db: Session = Depends(get_database),
+                      page: int = 1, size: int = 20, db: Session = Depends(get_database),
                       current_user: models.User = Depends(get_current_user)):
-    transactions = crud.get_transactions(
-        db=db, user_id=current_user.id, skip=skip, limit=limit,
+    skip = (page - 1) * size
+    result = crud.get_transactions(
+        db=db, user_id=current_user.id, skip=skip, limit=size,
         start_date=start_date, end_date=end_date, category_id=category_id, trans_type=trans_type
     )
-    return transactions
+    return schemas.Page(
+        items=result["items"],
+        total=result["total"],
+        page=skip,
+        size=size
+    )
 
 @router.get("/report/monthly", response_model=dict)
 def get_monthly_report(

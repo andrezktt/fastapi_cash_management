@@ -59,8 +59,9 @@ def get_transactions(db: Session, user_id: int, skip: int = 0, limit: int = 100,
     if trans_type:
         query = query.filter(models.Transaction.trans_type == trans_type)
 
+    total = query.count()
     transactions = query.order_by(models.Transaction.date.desc()).offset(skip).limit(limit).all()
-    return transactions
+    return {"items": transactions, "total": total}
 
 def get_transaction_by_id(db: Session, transaction_id: int):
     return db.query(models.Transaction).filter(models.Transaction.id == transaction_id).first()
