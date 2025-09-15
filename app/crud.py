@@ -86,3 +86,17 @@ def get_monthly_report(db: Session, user_id: int, year: int, month: int):
     balance = income - expenses
 
     return {"income": income, "expenses": expenses, "balance": balance}
+
+# Category Methods
+def get_category(db: Session, category_id: int):
+    return db.query(models.Category).filter(models.Category.id == category_id).first()
+
+def get_categories_by_user(db: Session, user_id: int, skip: int = 0, limit: int = 100):
+    return db.query(models.Category).filter(models.Category.user_id == user_id).offset(skip).limit(limit).all()
+
+def create_user_category(db: Session, category: schemas.CategoryCreate, user_id: int):
+    db_category = models.Category(**category.model_dump(), user_id=user_id)
+    db.add(db_category)
+    db.commit()
+    db.refresh(db_category)
+    return db_category

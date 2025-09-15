@@ -14,7 +14,15 @@ class User(Base):
     name = Column(String, index=True)
     email = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
-    transactions = relationship("Transaction", back_populates="owner")
+    transactions = relationship("Transaction", back_populates="owner", cascade='all, delete-orphan')
+    categories = relationship("Category", back_populates="owner", cascade="all, delete-orphan")
+
+class Category(Base):
+    __tablename__ = "categories"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, index=True, nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    owner = relationship("User", back_populates="categories")
 
 class Transaction(Base):
     __tablename__ = "transactions"
@@ -24,4 +32,6 @@ class Transaction(Base):
     amount = Column(Float, nullable=False)
     description = Column(String, index=True)
     date = Column(DateTime, default=datetime.now(UTC))
+    category_id = Column(Integer, ForeignKey("categories.id"), nullable=True)
     owner = relationship("User", back_populates="transactions")
+    category = relationship("Category")
