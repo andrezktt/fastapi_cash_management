@@ -31,7 +31,7 @@ class Transaction(Base):
     trans_type = Column(Enum(TransactionType))
     amount = Column(Float, nullable=False)
     description = Column(String, index=True)
-    date = Column(DateTime, default=datetime.now(UTC))
+    date = Column(DateTime(timezone=False), default=datetime.utcnow())
     category_id = Column(Integer, ForeignKey("categories.id"), nullable=True)
     owner = relationship("User", back_populates="transactions")
     category = relationship("Category")

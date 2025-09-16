@@ -1,8 +1,8 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
-    DATABASE_URL: str = "postgresql://user:password@host/db"
-    TEST_DATABASE_URL: str = "postgresql://user:password@host/test_db"
+    DATABASE_URL: str = "postgresql+asyncpg://user:password@host/db"
+    TEST_DATABASE_URL: str = "postgresql+asyncpg://user:password@host/test_db"
 
     SECRET_KEY: str = "super-secret-key-for-dev"
     ALGORITHM: str = "HS256"
