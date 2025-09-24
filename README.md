@@ -1,4 +1,4 @@
-# API de Controle Financeiro  वित्त
+# API de Controle Financeiro
 
 ![Python](https://img.shields.io/badge/Python-3.12-blue.svg)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.116-green.svg)
